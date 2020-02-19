@@ -1,0 +1,8 @@
+layout: layout.html
+pages:
+  - "_titlepage.html"
+  - "_toc.md"
+  - "[0-9]+*.md"
+data:
+  - data.yaml
+  - dynamic_data.js

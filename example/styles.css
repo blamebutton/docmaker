@@ -1,0 +1,62 @@
+body {
+  font-family: "Roboto", "Material Icons", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+}
+
+h1.title {
+  text-align: center;
+  font-size: 56px;
+}
+
+p.subtitle {
+  text-align: center;
+  font-size: 35px;
+}
+
+.table-of-contents li a::after {
+  content: target-counter(attr(href), page);
+  float: right;
+}
+
+@page :first {
+  border-top: 0px;
+  border-bottom: 0px;
+
+  @top-left {
+    content: "";
+  }
+
+  @bottom-left {
+    content: "";
+  }
+
+  @bottom-right {
+    content: "";
+  }
+}
+
+@page {
+  size: a4 portrait;
+  margin: 25mm 10mm 25mm 10mm;
+  padding-top: 5mm;
+  counter-increment: page;
+  font-family: "Roboto", "Material Icons", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  white-space: pre;
+  color: grey;
+
+  border-bottom: 1px solid #000;
+  border-top: 1px solid #000;
+
+  @top-left {
+    content: "Project Name";
+  }
+
+  @bottom-left {
+    content: "Project Name";
+  }
+
+  @bottom-right {
+    content: "Page " counter(page);
+  }
+}
