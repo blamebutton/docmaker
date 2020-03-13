@@ -1,4 +1,4 @@
 .vscode/
-node_modules/
-lib/
+example/
 yarn-error.log
+*.ts

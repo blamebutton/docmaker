@@ -3,5 +3,13 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-  }
+    "outDir": "lib",
+    "module": "commonjs",
+    "target": "es5",
+    "declaration": true,
+  },
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
 }
