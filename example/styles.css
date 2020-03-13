@@ -13,6 +13,10 @@ p.subtitle {
   font-size: 35px;
 }
 
+p.center {
+  text-align: center;
+}
+
 .table-of-contents li a::after {
   content: target-counter(attr(href), page);
   float: right;
@@ -49,11 +53,11 @@ p.subtitle {
   border-top: 1px solid #000;
 
   @top-left {
-    content: "Project Name";
+    content: "{{title}}";
   }
 
   @bottom-left {
-    content: "Project Name";
+    content: "{{title}}";
   }
 
   @bottom-right {

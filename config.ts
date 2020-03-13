@@ -5,6 +5,7 @@ import { promisify } from "util";
 import * as path from "path";
 import * as glob from "fast-glob";
 import * as signale from "signale";
+import * as jf from "joiful";
 import { env, cwd as getProcessCwd } from "process";
 import { ProjectFileException } from "./errors";
 
@@ -12,10 +13,154 @@ const readFile = promisify(fs.readFile);
 
 const CONFIG_FILE_NAME = "docmaker.yaml";
 
-export interface Config {
-  layout: string;
-  pages: Array<string>;
-  data: Array<string>;
+/**
+ * The configuration for Docmaker
+ */
+class Config {
+  @(jf.string().required())
+  public layout!: string;
+
+  @(jf.string().default("build"))
+  public buildDir!: string;
+
+  @(jf
+    .array()
+    .default([])
+    .items(j => j.string()))
+  public pages!: string[];
+
+  @(jf
+    .array()
+    .default([])
+    .items(j => j.string()))
+  public data!: string[];
+
+  @(jf
+    .array()
+    .default([])
+    .items(j => j.string()))
+  public assets!: string[];
+
+  public static async fromDirectory(projectDir: string): Promise<Config> {
+    let config = new Config();
+
+    const configPath = path.join(projectDir, CONFIG_FILE_NAME);
+    const content = await readFile(configPath);
+
+    // Load yaml config, use "Config" instead of "any"
+    let loadedConfig: Config = yaml.parse(content.toString());
+
+    // TODO: maybe automatically transfer values?
+    config.layout = loadedConfig.layout;
+    config.buildDir = loadedConfig.buildDir;
+    config.pages = loadedConfig.pages;
+    config.data = loadedConfig.data;
+    config.assets = loadedConfig.assets;
+
+    // Validate config
+    const validationResult = jf.validate(config);
+
+    // FIXME: wrap in better error
+    if (validationResult.error) {
+      throw validationResult.error;
+    }
+
+    // Override config with validated variant which has defaults applied
+    config = validationResult.value;
+
+    // Resolve all project files
+    [
+      config.layout,
+      config.pages,
+      config.data,
+      config.assets
+    ] = await Promise.all([
+      // Resolve the layout template
+      Config.resolveProjectFile(projectDir, config.layout),
+      // Resolve the globs for the pages
+      Config.resolvePages(projectDir, config.pages),
+      // Resolve the relative paths to the data files
+      Config.resolveProjectFiles(projectDir, config.data),
+      // Resolve the relative paths to the asset files
+      Config.resolveProjectFiles(projectDir, config.assets)
+    ]);
+
+    return config;
+  }
+
+  private static async resolveProjectFiles(
+    projectDir: string,
+    relativePaths: Array<string>
+  ): Promise<Array<string>> {
+    const paths = [];
+
+    for (const relativePath of relativePaths) {
+      try {
+        const filePath = await Config.resolveProjectFile(
+          projectDir,
+          relativePath
+        );
+        paths.push(filePath);
+      } catch (e) {
+        if (e instanceof ProjectFileException) {
+          // Log warning to console
+          signale.warn(e.message);
+        }
+      }
+    }
+
+    return paths;
+  }
+
+  private static async resolveProjectFile(
+    projectDir: string,
+    relativePath: string
+  ): Promise<string> {
+    const filePath = path.join(projectDir, relativePath);
+
+    const exists = await findUp.exists(filePath);
+
+    if (!exists) {
+      throw new ProjectFileException(
+        `Could not find project file with path ${filePath}`
+      );
+    }
+
+    return filePath;
+  }
+
+  private static async resolvePages(
+    dir: string,
+    pageGlobs: Array<string>
+  ): Promise<Array<string>> {
+    // Glob & sort all pages in parallell
+    const results = await Promise.all(
+      pageGlobs.map(async file => {
+        // Match glob with project directory as cwd, retrieve absolute paths
+        const files = await glob(file, { cwd: dir, absolute: true });
+
+        // fast-glob makes no guarantees about sorting, so we'll sort the files per-glob here.
+        return files.sort();
+      })
+    );
+
+    let paths: string[] = [];
+
+    results.forEach((result, index) => {
+      // Glob returned no results, give warning
+      if (result.length == 0) {
+        signale.warn(
+          `Page glob "${pageGlobs[index]}" did not match any files.`
+        );
+      }
+
+      // Flatten results
+      paths.push(...result);
+    });
+
+    // Flatten results
+    return paths;
+  }
 }
 
 function getCwd(): string {
@@ -28,7 +173,7 @@ function getCwd(): string {
   return getProcessCwd();
 }
 
-export async function findProjectDirectory(): Promise<string> {
+async function findProjectDirectory(): Promise<string> {
   // Walk up the directory tree
   const projectDirectory = await findUp(
     async directory => {
@@ -36,7 +181,11 @@ export async function findProjectDirectory(): Promise<string> {
       const hasConfigFile = await findUp.exists(
         path.join(directory, CONFIG_FILE_NAME)
       );
-      return hasConfigFile && directory;
+
+      if (hasConfigFile) {
+        return directory;
+      }
+      return undefined;
     },
     // find directory & start in custom CWD
     { type: "directory", cwd: getCwd() }
@@ -50,91 +199,4 @@ export async function findProjectDirectory(): Promise<string> {
   return projectDirectory;
 }
 
-export async function loadConfig(projectDir: string): Promise<Config> {
-  // Load project config file
-  const configPath = path.join(projectDir, CONFIG_FILE_NAME);
-  const content = await readFile(configPath);
-
-  // Parse the project config
-  const config: Config = yaml.parse(content.toString());
-
-  [config.layout, config.pages, config.data] = await Promise.all([
-    // Resolve the layout template
-    resolveProjectFile(projectDir, config.layout),
-    // Resolve the globs for the pages
-    resolvePages(projectDir, config.pages),
-    // Resolve the relative paths to the data files
-    resolveProjectFiles(projectDir, config.data)
-  ]);
-
-  return config;
-}
-
-async function resolvePages(
-  dir: string,
-  pageGlobs: Array<string>
-): Promise<Array<string>> {
-  // Glob & sort all pages in parallell
-  const results = await Promise.all(
-    pageGlobs.map(async file => {
-      // Match glob with project directory as cwd, retrieve absolute paths
-      const files = await glob(file, { cwd: dir, absolute: true });
-
-      // fast-glob makes no guarantees about sorting, so we'll sort the files per-glob here.
-      return files.sort();
-    })
-  );
-
-  let paths = [];
-
-  results.forEach((result, index) => {
-    // Glob returned no results, give warning
-    if (result.length == 0) {
-      signale.warn(`Page glob "${pageGlobs[index]}" did not match any files.`);
-    }
-
-    // Flatten results
-    paths.push(...result);
-  });
-
-  // Flatten results
-  return paths;
-}
-
-async function resolveProjectFiles(
-  projectDir: string,
-  relativePaths: Array<string>
-): Promise<Array<string>> {
-  const paths = [];
-
-  for (const relativePath of relativePaths) {
-    try {
-      const filePath = await resolveProjectFile(projectDir, relativePath);
-      paths.push(filePath);
-    } catch (e) {
-      if (e instanceof ProjectFileException) {
-        // Log warning to console
-        signale.warn(e.message);
-      }
-    }
-  }
-
-  return paths;
-}
-
-async function resolveProjectFile(
-  projectDir: string,
-  relativePath: string
-): Promise<string> {
-  const filePath = path.join(projectDir, relativePath);
-
-  const exists = await findUp.exists(filePath);
-
-  if (!exists) {
-    throw new ProjectFileException(
-      `Could not find project file with path ${filePath}`
-    );
-  }
-
-  return filePath;
-}
+export { findProjectDirectory, Config };

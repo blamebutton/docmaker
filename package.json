@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "start": "ts-node index.ts",
-    "build": "tsc index.ts"
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/highlight.js": "^9.12.3",
@@ -22,13 +22,16 @@
     "fast-glob": "^3.2.0",
     "find-up": "^4.1.0",
     "highlight.js": "^9.18.1",
+    "joiful": "^2.0.0",
     "liquidjs": "^9.7.0",
     "markdown-it": "^10.0.0",
     "markdown-it-anchor": "^5.2.5",
     "markdown-it-github-preamble": "^1.0.0",
     "markdown-it-textual-uml": "^0.1.3",
     "markdown-it-toc-done-right": "^4.1.0",
+    "reflect-metadata": "^0.1.13",
     "signale": "^1.4.0",
+    "source-map-support": "^0.5.16",
     "yaml": "^1.7.2"
   },
   "bin": {

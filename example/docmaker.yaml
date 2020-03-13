@@ -6,3 +6,5 @@ pages:
 data:
   - data.yaml
   - dynamic_data.js
+assets:
+  - styles.css

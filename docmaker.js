@@ -1,2 +1,3 @@
 #!/usr/bin/env node
-require('./index.js')
+require("source-map-support").install();
+require("./index.js");

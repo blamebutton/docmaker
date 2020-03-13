@@ -1,3 +1,5 @@
-module.exports = {
-  date: new Date().toDateString()
+module.exports = function() {
+  return {
+    date: new Date().toDateString()
+  };
 };
