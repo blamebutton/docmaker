@@ -8,11 +8,13 @@ Docmaker is a **WIP** markdown documentation rendering tool.
 
 `$ docmaker <dir>`
 
-Docmaker will 
+Docmaker will try to find `docmaker.yaml` in the current directory or above and resolve all filepaths specified in the config relative to this `project directory`.
 
 ## Config
 
-Via a config file called `docmaker.yaml` you can specify pages to render, which data to use and which layout html file the document should use.
+Via a config file called `docmaker.yaml` you can specify pages to render, which data to load and which layout HTML file the document should use.
+
+### Example
 
 ```yaml
 layout: layout.html
