@@ -1,80 +1,54 @@
-import * as findUp from "find-up";
-import * as fs from "fs";
-import * as yaml from "yaml";
-import { promisify } from "util";
-import * as path from "path";
-import * as glob from "fast-glob";
-import * as signale from "signale";
-import * as jf from "joiful";
-import { env, cwd as getProcessCwd } from "process";
-import { ProjectFileException } from "./errors";
+import * as findUp from 'find-up';
+import * as yaml from 'yaml';
+import * as path from 'path';
+import * as glob from 'fast-glob';
+import * as signale from 'signale';
+import * as jf from 'joiful';
+import {cwd as getProcessCwd, env} from 'process';
+import ProjectFileError from './errors/project-file-error';
+import {readFile} from './utils/file-utils';
+import ValidationError from './errors/validation-error';
 
-const readFile = promisify(fs.readFile);
-
-const CONFIG_FILE_NAME = "docmaker.yaml";
+const CONFIG_FILE_NAME = 'docmaker.yaml';
 
 /**
  * The configuration for Docmaker
  */
-class Config {
-  @(jf.string().required())
+export class Config {
+
+  @jf.string().required()
   public layout!: string;
 
-  @(jf.string().default("build"))
+  @jf.string().default('build')
   public buildDir!: string;
 
-  @(jf
-    .array()
-    .default([])
-    .items(j => j.string()))
+  @jf.array().default([]).items(t => t.string())
   public pages!: string[];
 
-  @(jf
-    .array()
-    .default([])
-    .items(j => j.string()))
+  @jf.array().default([]).items(t => t.string())
   public data!: string[];
 
-  @(jf
-    .array()
-    .default([])
-    .items(j => j.string()))
+  @jf.array().default([]).items(t => t.string())
   public assets!: string[];
 
   public static async fromDirectory(projectDir: string): Promise<Config> {
-    let config = new Config();
-
     const configPath = path.join(projectDir, CONFIG_FILE_NAME);
     const content = await readFile(configPath);
-
     // Load yaml config, use "Config" instead of "any"
-    let loadedConfig: Config = yaml.parse(content.toString());
-
-    // TODO: maybe automatically transfer values?
-    config.layout = loadedConfig.layout;
-    config.buildDir = loadedConfig.buildDir;
-    config.pages = loadedConfig.pages;
-    config.data = loadedConfig.data;
-    config.assets = loadedConfig.assets;
+    const parsedConfig: Config = yaml.parse(content.toString());
+    let config: Config = new Config().merge(parsedConfig);
 
     // Validate config
     const validationResult = jf.validate(config);
 
-    // FIXME: wrap in better error
     if (validationResult.error) {
-      throw validationResult.error;
+      throw new ValidationError(validationResult.error);
     }
-
     // Override config with validated variant which has defaults applied
     config = validationResult.value;
 
     // Resolve all project files
-    [
-      config.layout,
-      config.pages,
-      config.data,
-      config.assets
-    ] = await Promise.all([
+    [config.layout, config.pages, config.data, config.assets] = await Promise.all([
       // Resolve the layout template
       Config.resolveProjectFile(projectDir, config.layout),
       // Resolve the globs for the pages
@@ -84,7 +58,6 @@ class Config {
       // Resolve the relative paths to the asset files
       Config.resolveProjectFiles(projectDir, config.assets)
     ]);
-
     return config;
   }
 
@@ -96,13 +69,10 @@ class Config {
 
     for (const relativePath of relativePaths) {
       try {
-        const filePath = await Config.resolveProjectFile(
-          projectDir,
-          relativePath
-        );
+        const filePath = await Config.resolveProjectFile(projectDir, relativePath);
         paths.push(filePath);
       } catch (e) {
-        if (e instanceof ProjectFileException) {
+        if (e instanceof ProjectFileError) {
           // Log warning to console
           signale.warn(e.message);
         }
@@ -121,7 +91,7 @@ class Config {
     const exists = await findUp.exists(filePath);
 
     if (!exists) {
-      throw new ProjectFileException(
+      throw new ProjectFileError(
         `Could not find project file with path ${filePath}`
       );
     }
@@ -133,11 +103,11 @@ class Config {
     dir: string,
     pageGlobs: Array<string>
   ): Promise<Array<string>> {
-    // Glob & sort all pages in parallell
+    // Glob & sort all pages in parallel
     const results = await Promise.all(
       pageGlobs.map(async file => {
         // Match glob with project directory as cwd, retrieve absolute paths
-        const files = await glob(file, { cwd: dir, absolute: true });
+        const files = await glob(file, {cwd: dir, absolute: true});
 
         // fast-glob makes no guarantees about sorting, so we'll sort the files per-glob here.
         return files.sort();
@@ -161,6 +131,16 @@ class Config {
     // Flatten results
     return paths;
   }
+
+  /**
+   * Merge a config onto the object.
+   * @param config to merge
+   */
+  protected merge(config: Config) {
+    const setter = ([key, value]) => this[key] = value;
+    Object.entries(config).forEach(setter);
+    return this;
+  }
 }
 
 function getCwd(): string {
@@ -173,7 +153,7 @@ function getCwd(): string {
   return getProcessCwd();
 }
 
-async function findProjectDirectory(): Promise<string> {
+export async function findProjectDirectory(): Promise<string> {
   // Walk up the directory tree
   const projectDirectory = await findUp(
     async directory => {
@@ -188,15 +168,13 @@ async function findProjectDirectory(): Promise<string> {
       return undefined;
     },
     // find directory & start in custom CWD
-    { type: "directory", cwd: getCwd() }
+    {type: 'directory', cwd: getCwd()}
   );
 
   // Find-up was not able to find a directory with a config file
   if (projectDirectory === undefined) {
-    throw new ProjectFileException("Could not find config file.");
+    throw new ProjectFileError('Could not find config file.');
   }
 
   return projectDirectory;
 }
-
-export { findProjectDirectory, Config };

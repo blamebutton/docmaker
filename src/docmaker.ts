@@ -1,19 +1,15 @@
-import * as fs from "fs";
-import { promisify } from "util";
-import { findProjectDirectory, Config } from "./config";
-import { extname, join as pathJoin, basename } from "path";
-import * as signale from "signale";
-import { UserError } from "./errors";
-import * as findUp from "find-up";
-import { FileRenderer } from "./renderer";
-import { loadData } from "./data";
-
-const writeFile = promisify(fs.writeFile);
-const copyFile = promisify(fs.copyFile);
-const makeDir = promisify(fs.mkdir);
+import * as fs from 'fs';
+import {Config, findProjectDirectory} from './config';
+import {basename, extname, join as pathJoin} from 'path';
+import * as signale from 'signale';
+import * as findUp from 'find-up';
+import {DocRenderer} from './doc-renderer';
+import {loadData} from './data';
+import UserError from './errors/user-error';
+import {copyFile, joinFiles, mkdir, writeFile} from './utils/file-utils';
 
 const hardcodedData = {
-  pagebreak: `<div style="page-break-after: always"></div>`
+  break: `<div style="page-break-after: always"></div>`
 };
 
 const getBuildDir = async (
@@ -26,14 +22,14 @@ const getBuildDir = async (
 
   // Create build directory if it does not yet exist
   if (!exists) {
-    makeDir(buildDir);
+    await mkdir(buildDir);
   }
 
   return buildDir;
 };
 
 const processAssets = async (
-  renderer: FileRenderer,
+  renderer: DocRenderer,
   buildDir: string,
   assets: string[]
 ) => {
@@ -44,8 +40,8 @@ const processAssets = async (
     const fileExt = extname(assetBaseName);
 
     switch (fileExt) {
-      case ".css":
-        const renderedAsset = await renderer.renderFile(assetPath);
+      case '.css':
+        const renderedAsset = await renderer.renderLiquidFile(assetPath);
         await writeFile(assetDistPath, renderedAsset);
         break;
       default:
@@ -55,18 +51,17 @@ const processAssets = async (
 };
 
 const writeDocument = async (
-  renderer: FileRenderer,
+  renderer: DocRenderer,
   buildDir: string,
   layout: string,
   content: string
 ) => {
   // Render layout with data & content
-  const document = await renderer.renderFile(layout, {
+  const document = await renderer.renderLiquidFile(layout, {
     content: content
   });
 
-  const filePath = pathJoin(buildDir, "index.html");
-
+  const filePath = pathJoin(buildDir, 'index.html');
   await writeFile(filePath, document);
 };
 
@@ -80,12 +75,11 @@ const run = async () => {
     ...(await loadData(config.data))
   };
 
-  const renderer = new FileRenderer(data);
+  const renderer = new DocRenderer(data);
 
   // Render all pages with data & join content
-  const content = (
-    await Promise.all(config.pages.map(page => renderer.renderFile(page)))
-  ).join("");
+  const joinedFiles = await joinFiles(config.pages);
+  const content = await renderer.renderPage(joinedFiles);
 
   const buildDir = await getBuildDir(projectDir, config.buildDir);
 

@@ -2,4 +2,4 @@
 
 [[toc]]
 
-{{pagebreak}}
+{{ break }}
