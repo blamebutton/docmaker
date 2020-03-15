@@ -8,3 +8,4 @@ data:
   - dynamic_data.js
 assets:
   - styles.css
+  - image.png
