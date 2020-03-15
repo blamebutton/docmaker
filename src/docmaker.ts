@@ -1,19 +1,16 @@
 import * as fs from "fs";
-import { promisify } from "util";
-import { findProjectDirectory, Config } from "./config";
-import { extname, join as pathJoin, basename } from "path";
+import {Config, findProjectDirectory} from "./config";
+import {basename, extname, join as pathJoin} from "path";
 import * as signale from "signale";
-import { UserError } from "./errors";
 import * as findUp from "find-up";
-import { FileRenderer } from "./renderer";
-import { loadData } from "./data";
-
-const writeFile = promisify(fs.writeFile);
-const copyFile = promisify(fs.copyFile);
-const makeDir = promisify(fs.mkdir);
+import {FileRenderer} from "./file-renderer";
+import {loadData} from "./data";
+import UserError from "./errors/user-error";
+import FileProcessor from "./file-processor";
+import {copyFile, mkdir, writeFile} from "./utils/file-utils";
 
 const hardcodedData = {
-  pagebreak: `<div style="page-break-after: always"></div>`
+  break: `<div style="page-break-after: always"></div>`
 };
 
 const getBuildDir = async (
@@ -26,7 +23,7 @@ const getBuildDir = async (
 
   // Create build directory if it does not yet exist
   if (!exists) {
-    makeDir(buildDir);
+    await mkdir(buildDir);
   }
 
   return buildDir;
@@ -45,7 +42,7 @@ const processAssets = async (
 
     switch (fileExt) {
       case ".css":
-        const renderedAsset = await renderer.renderFile(assetPath);
+        const renderedAsset = await renderer.processFile(assetPath);
         await writeFile(assetDistPath, renderedAsset);
         break;
       default:
@@ -80,12 +77,12 @@ const run = async () => {
     ...(await loadData(config.data))
   };
 
+  const processor = new FileProcessor();
   const renderer = new FileRenderer(data);
 
   // Render all pages with data & join content
-  const content = (
-    await Promise.all(config.pages.map(page => renderer.renderFile(page)))
-  ).join("");
+  const joinedFiles = await processor.joinFiles(config.pages);
+  const content = await renderer.render(joinedFiles, data);
 
   const buildDir = await getBuildDir(projectDir, config.buildDir);
 

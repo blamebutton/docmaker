@@ -1,10 +1,8 @@
-import * as fs from "fs";
 import * as yaml from "yaml";
-import { promisify } from "util";
-import { UserError } from "./errors";
+import UserError from "./errors/user-error";
 import * as signale from "signale";
-import { extname } from "path";
-const readFile = promisify(fs.readFile);
+import {extname} from "path";
+import {readFile} from "./utils/file-utils";
 
 const loadJsDataFile = async (file: string): Promise<any> => {
   const val = await import(file);
@@ -48,4 +46,4 @@ const loadData = async (dataFiles: string[]): Promise<Object> => {
   return data;
 };
 
-export { loadData };
+export {loadData};

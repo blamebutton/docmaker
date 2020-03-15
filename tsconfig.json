@@ -5,8 +5,8 @@
     "emitDecoratorMetadata": true,
     "outDir": "lib",
     "module": "commonjs",
-    "target": "es5",
-    "declaration": true,
+    "target": "es6",
+    "declaration": true
   },
   "exclude": [
     "node_modules",

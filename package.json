@@ -9,13 +9,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "ts-node index.js",
     "build": "tsc"
   },
   "devDependencies": {
     "@types/highlight.js": "^9.12.3",
     "@types/markdown-it": "^0.0.9",
-    "@types/node": "^13.7.1",
+    "@types/node": "13.9.1",
     "@types/signale": "^1.2.1",
     "@types/source-map-support": "^0.5.1",
     "@types/yaml": "^1.2.0",
@@ -28,6 +28,7 @@
     "highlight.js": "^9.18.1",
     "joiful": "^2.0.0",
     "liquidjs": "^9.7.0",
+    "lodash": "^4.17.15",
     "markdown-it": "^10.0.0",
     "markdown-it-anchor": "^5.2.5",
     "markdown-it-github-preamble": "^1.0.0",
