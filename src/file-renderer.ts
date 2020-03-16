@@ -1,71 +1,37 @@
-import * as MarkdownIt from "markdown-it";
-import * as tocPlugin from "markdown-it-toc-done-right";
-import * as anchorPlugin from "markdown-it-anchor";
-import * as umlPlugin from "markdown-it-textual-uml";
-import {getLanguage, highlight} from "highlight.js";
-import TemplateEngine from "./template-engine";
-import {readFile} from "./utils/file-utils";
+import Renderer from "./renderer/renderer";
+import {MarkdownRenderer} from "./renderer/markdown-renderer";
+import {LiquidRenderer} from "./renderer/liquid-renderer";
 
-export class FileRenderer {
+export class FileRenderer implements Renderer {
 
   private readonly data: Object;
-  private markdown: MarkdownIt;
-  private templateEngine: TemplateEngine;
+  private markdown: Renderer;
+  private liquid: Renderer;
 
   /**
-   * Constructor that takes
+   * Constructor that takes the data
    * @param data
    */
   constructor(data: Object) {
     this.data = data;
-    this.markdown = FileRenderer.buildMarkdownEngine();
-    this.templateEngine = new TemplateEngine();
+    this.markdown = new MarkdownRenderer();
+    this.liquid = new LiquidRenderer();
   }
 
-  /**
-   * Build the markdown engine and include all plugins.
-   */
-  private static buildMarkdownEngine() {
-    const markdown = new MarkdownIt({
-      typographer: true,
-      linkify: true,
-      highlight: FileRenderer.highlight,
-      html: true
-    });
-    // Register markdown-it plugins
-    markdown.use(anchorPlugin);
-    markdown.use(tocPlugin, {level: 2});
-    markdown.use(umlPlugin);
-    return markdown;
+  public async renderLiquidFile(path: string, data: Object = {}): Promise<string> {
+    return this.liquid.renderFile(path, {...this.data, ...data});
   }
 
-  private static highlight(str: string, lang: string) {
-    if (lang && getLanguage(lang)) {
-      try {
-        return highlight(lang, str).value;
-      } catch (_) {
-      }
-      return ""; // use external default escaping
-    }
-    return null;
-  }
-
-  public async processFile(path: string, data: Object = {}): Promise<string> {
-    let content = (await readFile(path)).toString();
-    return this.process(content, data);
-  }
-
-  public async process(content: string, data: Object = {}): Promise<string> {
-    return await this.templateEngine.render(content, {...this.data, ...data});
+  public async renderLiquidTemplate(content: string, data: Object = {}): Promise<string> {
+    return this.liquid.render(content, {...this.data, ...data});
   }
 
   public async renderFile(path: string, data: Object = {}): Promise<string> {
-    let content = (await readFile(path)).toString();
-    return this.render(content, data);
+    return this.markdown.renderFile(path, {...this.data, ...data});
   }
 
   public async render(content: string, data: Object = {}): Promise<string> {
-    const contents = await this.process(content, data);
+    const contents = await this.renderLiquidTemplate(content, {...this.data, ...data});
     return this.markdown.render(contents, {});
   }
 }

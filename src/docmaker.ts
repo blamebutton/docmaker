@@ -42,7 +42,7 @@ const processAssets = async (
 
     switch (fileExt) {
       case ".css":
-        const renderedAsset = await renderer.processFile(assetPath);
+        const renderedAsset = await renderer.renderLiquidFile(assetPath);
         await writeFile(assetDistPath, renderedAsset);
         break;
       default:
