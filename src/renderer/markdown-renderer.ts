@@ -1,4 +1,4 @@
-import Renderer from "./renderer";
+import FileRenderer from "./file-renderer";
 import * as MarkdownIt from "markdown-it";
 import {getLanguage} from "highlight.js";
 import * as tocPlugin from "markdown-it-toc-done-right";
@@ -6,7 +6,7 @@ import * as anchorPlugin from "markdown-it-anchor";
 import * as umlPlugin from "markdown-it-textual-uml";
 import {readFile} from "../utils/file-utils";
 
-export class MarkdownRenderer implements Renderer {
+export class MarkdownRenderer implements FileRenderer {
 
   private markdown: MarkdownIt;
 

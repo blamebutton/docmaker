@@ -3,7 +3,7 @@ import {Config, findProjectDirectory} from "./config";
 import {basename, extname, join as pathJoin} from "path";
 import * as signale from "signale";
 import * as findUp from "find-up";
-import {FileRenderer} from "./file-renderer";
+import {DocRenderer} from "./doc-renderer";
 import {loadData} from "./data";
 import UserError from "./errors/user-error";
 import FileProcessor from "./file-processor";
@@ -30,7 +30,7 @@ const getBuildDir = async (
 };
 
 const processAssets = async (
-  renderer: FileRenderer,
+  renderer: DocRenderer,
   buildDir: string,
   assets: string[]
 ) => {
@@ -52,13 +52,13 @@ const processAssets = async (
 };
 
 const writeDocument = async (
-  renderer: FileRenderer,
+  renderer: DocRenderer,
   buildDir: string,
   layout: string,
   content: string
 ) => {
   // Render layout with data & content
-  const document = await renderer.renderFile(layout, {
+  const document = await renderer.renderMarkdownFile(layout, {
     content: content
   });
 
@@ -78,11 +78,11 @@ const run = async () => {
   };
 
   const processor = new FileProcessor();
-  const renderer = new FileRenderer(data);
+  const renderer = new DocRenderer(data);
 
   // Render all pages with data & join content
   const joinedFiles = await processor.joinFiles(config.pages);
-  const content = await renderer.render(joinedFiles, data);
+  const content = await renderer.renderMarkdownTemplate(joinedFiles);
 
   const buildDir = await getBuildDir(projectDir, config.buildDir);
 
