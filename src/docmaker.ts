@@ -1,13 +1,12 @@
-import * as fs from "fs";
-import {Config, findProjectDirectory} from "./config";
+import * as fs from 'fs';
+import {Config, findProjectDirectory} from './config';
 import {basename, extname, join as pathJoin} from "path";
-import * as signale from "signale";
-import * as findUp from "find-up";
-import {DocRenderer} from "./doc-renderer";
-import {loadData} from "./data";
-import UserError from "./errors/user-error";
-import FileProcessor from "./file-processor";
-import {copyFile, mkdir, writeFile} from "./utils/file-utils";
+import * as signale from 'signale';
+import * as findUp from 'find-up';
+import {DocRenderer} from './doc-renderer';
+import {loadData} from './data';
+import UserError from './errors/user-error';
+import {copyFile, joinFiles, mkdir, writeFile} from './utils/file-utils';
 
 const hardcodedData = {
   break: `<div style="page-break-after: always"></div>`
@@ -41,7 +40,7 @@ const processAssets = async (
     const fileExt = extname(assetBaseName);
 
     switch (fileExt) {
-      case ".css":
+      case '.css':
         const renderedAsset = await renderer.renderLiquidFile(assetPath);
         await writeFile(assetDistPath, renderedAsset);
         break;
@@ -58,12 +57,11 @@ const writeDocument = async (
   content: string
 ) => {
   // Render layout with data & content
-  const document = await renderer.renderMarkdownFile(layout, {
+  const document = await renderer.renderLiquidFile(layout, {
     content: content
   });
 
-  const filePath = pathJoin(buildDir, "index.html");
-
+  const filePath = pathJoin(buildDir, 'index.html');
   await writeFile(filePath, document);
 };
 
@@ -77,11 +75,10 @@ const run = async () => {
     ...(await loadData(config.data))
   };
 
-  const processor = new FileProcessor();
   const renderer = new DocRenderer(data);
 
   // Render all pages with data & join content
-  const joinedFiles = await processor.joinFiles(config.pages);
+  const joinedFiles = await joinFiles(config.pages);
   const content = await renderer.renderMarkdownTemplate(joinedFiles);
 
   const buildDir = await getBuildDir(projectDir, config.buildDir);

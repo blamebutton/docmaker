@@ -1,4 +1,4 @@
-import UserError from "./user-error";
+import UserError from './user-error';
 
 export default class ProjectFileError extends UserError {
   constructor(message: string) {

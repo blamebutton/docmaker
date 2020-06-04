@@ -1,12 +1,13 @@
-import * as findUp from "find-up";
-import * as yaml from "yaml";
-import * as path from "path";
-import * as glob from "fast-glob";
-import * as signale from "signale";
-import * as jf from "joiful";
-import {cwd as getProcessCwd, env} from "process";
-import ProjectFileError from "./errors/project-file-error";
-import {readFile} from "./utils/file-utils";
+import * as findUp from 'find-up';
+import * as yaml from 'yaml';
+import * as path from 'path';
+import * as glob from 'fast-glob';
+import * as signale from 'signale';
+import * as jf from 'joiful';
+import {cwd as getProcessCwd, env} from 'process';
+import ProjectFileError from './errors/project-file-error';
+import {readFile} from './utils/file-utils';
+import ValidationError from './errors/validation-error';
 
 const CONFIG_FILE_NAME = 'docmaker.yaml';
 
@@ -18,16 +19,16 @@ export class Config {
   @jf.string().required()
   public layout!: string;
 
-  @jf.string().default("build")
+  @jf.string().default('build')
   public buildDir!: string;
 
-  @jf.array().default([]).items(j => j.string())
+  @jf.array().default([]).items(t => t.string())
   public pages!: string[];
 
-  @jf.array().default([]).items(j => j.string())
+  @jf.array().default([]).items(t => t.string())
   public data!: string[];
 
-  @jf.array().default([]).items(j => j.string())
+  @jf.array().default([]).items(t => t.string())
   public assets!: string[];
 
   public static async fromDirectory(projectDir: string): Promise<Config> {
@@ -44,7 +45,7 @@ export class Config {
 
     // FIXME: wrap in better error
     if (validationResult.error) {
-      throw validationResult.error;
+      throw new ValidationError(validationResult.error);
     }
     // Override config with validated variant which has defaults applied
     config = validationResult.value;
@@ -139,11 +140,8 @@ export class Config {
    * @param config to merge
    */
   protected merge(config: Config) {
-    this.layout = config.layout;
-    this.buildDir = config.buildDir;
-    this.pages = config.pages;
-    this.data = config.data;
-    this.assets = config.assets;
+    const setter = ([key, value]) => this[key] = value;
+    Object.entries(config).forEach(setter);
   }
 }
 
@@ -172,12 +170,12 @@ export async function findProjectDirectory(): Promise<string> {
       return undefined;
     },
     // find directory & start in custom CWD
-    {type: "directory", cwd: getCwd()}
+    {type: 'directory', cwd: getCwd()}
   );
 
   // Find-up was not able to find a directory with a config file
   if (projectDirectory === undefined) {
-    throw new ProjectFileError("Could not find config file.");
+    throw new ProjectFileError('Could not find config file.');
   }
 
   return projectDirectory;

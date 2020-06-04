@@ -5,4 +5,4 @@
 | 1    |   2 |
 | john | doe |
 
-![Some figure](./image.png)
+![Some figure](image.png)
