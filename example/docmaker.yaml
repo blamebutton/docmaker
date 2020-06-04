@@ -4,7 +4,7 @@ pages:
   - "_toc.md"
   - "[0-9]+*.md"
 data:
-  - data.yml
+  - data.yaml
   - dynamic_data.js
 assets:
   - styles.css

@@ -8,7 +8,7 @@ import {cwd as getProcessCwd, env} from "process";
 import ProjectFileError from "./errors/project-file-error";
 import {readFile} from "./utils/file-utils";
 
-const CONFIG_FILE_NAME = 'docmaker.yml';
+const CONFIG_FILE_NAME = 'docmaker.yaml';
 
 /**
  * The configuration for Docmaker
