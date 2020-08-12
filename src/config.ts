@@ -44,6 +44,7 @@ export class Config {
     if (validationResult.error) {
       throw new ValidationError(validationResult.error);
     }
+
     // Override config with validated variant which has defaults applied
     config = validationResult.value;
 
@@ -58,6 +59,7 @@ export class Config {
       // Resolve the relative paths to the asset files
       Config.resolveProjectFiles(projectDir, config.assets)
     ]);
+
     return config;
   }
 
