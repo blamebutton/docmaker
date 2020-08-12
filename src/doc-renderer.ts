@@ -26,11 +26,7 @@ export class DocRenderer {
     return this.liquid.render(content, {...this.data, ...data});
   }
 
-  public async renderMarkdownFile(path: string, data: Object = {}): Promise<string> {
-    return this.markdown.renderFile(path, {...this.data, ...data});
-  }
-
-  public async renderMarkdownTemplate(content: string, data: Object = {}): Promise<string> {
+  public async renderPage(content: string, data: Object = {}): Promise<string> {
     const contents = await this.renderLiquidTemplate(content, {...this.data, ...data});
     return this.markdown.render(contents, {});
   }

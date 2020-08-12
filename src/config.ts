@@ -36,17 +36,15 @@ export class Config {
     const content = await readFile(configPath);
     // Load yaml config, use "Config" instead of "any"
     const parsedConfig: Config = yaml.parse(content.toString());
-    let config: Config = new Config();
-    // TODO: maybe automatically transfer values?
-    config.merge(parsedConfig);
+    let config: Config = new Config().merge(parsedConfig);
 
     // Validate config
     const validationResult = jf.validate(config);
 
-    // FIXME: wrap in better error
     if (validationResult.error) {
       throw new ValidationError(validationResult.error);
     }
+
     // Override config with validated variant which has defaults applied
     config = validationResult.value;
 
@@ -61,6 +59,7 @@ export class Config {
       // Resolve the relative paths to the asset files
       Config.resolveProjectFiles(projectDir, config.assets)
     ]);
+
     return config;
   }
 
@@ -142,6 +141,7 @@ export class Config {
   protected merge(config: Config) {
     const setter = ([key, value]) => this[key] = value;
     Object.entries(config).forEach(setter);
+    return this;
   }
 }
 

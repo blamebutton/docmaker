@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import {Config, findProjectDirectory} from './config';
-import {basename, extname, join as pathJoin} from "path";
+import {basename, extname, join as pathJoin} from 'path';
 import * as signale from 'signale';
 import * as findUp from 'find-up';
 import {DocRenderer} from './doc-renderer';
@@ -79,7 +79,7 @@ const run = async () => {
 
   // Render all pages with data & join content
   const joinedFiles = await joinFiles(config.pages);
-  const content = await renderer.renderMarkdownTemplate(joinedFiles);
+  const content = await renderer.renderPage(joinedFiles);
 
   const buildDir = await getBuildDir(projectDir, config.buildDir);
 
