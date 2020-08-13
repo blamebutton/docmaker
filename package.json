@@ -8,10 +8,10 @@
     "templating",
     "documentation"
   ],
-  "homepage": "https://github.com/Raqbit/docmaker",
+  "homepage": "https://github.com/BlameButton/docmaker",
   "bugs": {
     "email": "me@raqb.it",
-    "url": "https://github.com/Raqbit/docmaker/issues"
+    "url": "https://github.com/BlameButton/docmaker/issues"
   },
   "license": "MIT",
   "author": {
@@ -30,7 +30,7 @@
   "bin": {
     "docmaker": "index.js"
   },
-  "repository": "github:Raqbit/docmaker",
+  "repository": "github:BlameButton/docmaker",
   "scripts": {
     "start": "ts-node src/docmaker.ts",
     "build": "tsc"
