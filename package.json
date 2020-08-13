@@ -14,12 +14,12 @@
     "url": "https://github.com/BlameButton/docmaker/issues"
   },
   "license": "MIT",
-  "author": {
-    "name": "Raqbit",
-    "email": "me@raqb.it",
-    "url": "https://github.com/Raqbit"
-  },
   "contributors": [
+    {
+      "name": "Ramon",
+      "email": "me@raqb.it",
+      "url": "https://github.com/Raqbit"
+    },
     {
       "name": "Bram Ceulemans",
       "email": "bramceulemans@me.com",
