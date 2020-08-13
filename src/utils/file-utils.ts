@@ -38,7 +38,6 @@ export async function joinFiles(files: string[]): Promise<string> {
   return result;
 }
 
-
 export function getCwd(): string {
   // Use original CWD when ran from an NPM script
   if (env.INIT_CWD !== undefined) {

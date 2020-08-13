@@ -2,10 +2,11 @@ import * as findUp from 'find-up';
 import * as yaml from 'yaml';
 import * as path from 'path';
 import * as glob from 'fast-glob';
-import * as jf from 'joiful';
-import ProjectFileError from './errors/project-file-error';
+import ProjectFileNotFoundError from './errors/project-file-not-found-error';
 import {getCwd, readFile} from './utils/file-utils';
-import ValidationError from './errors/validation-error';
+import ConfigValidationError from './errors/config-validation-error';
+import {IsNotEmpty, IsString, validate} from 'class-validator';
+import MissingConfigError from './errors/missing-config-error';
 import {logger} from './docmaker';
 
 const CONFIG_FILE_NAME = 'docmaker.yaml';
@@ -15,37 +16,39 @@ const CONFIG_FILE_NAME = 'docmaker.yaml';
  */
 export class Config {
 
-  @jf.string().required()
+  @IsNotEmpty()
+  @IsString()
   public layout!: string;
 
-  @jf.string().default('build')
-  public buildDir!: string;
+  @IsNotEmpty()
+  @IsString()
+  public buildDir: string = 'build';
 
-  @jf.array().default([]).items(t => t.string())
-  public pages!: string[];
+  @IsNotEmpty({each: true})
+  @IsString({each: true})
+  public pages: string[] = [];
 
-  @jf.array().default([]).items(t => t.string())
-  public data!: string[];
+  @IsNotEmpty({each: true})
+  @IsString({each: true})
+  public data: string[] = [];
 
-  @jf.array().default([]).items(t => t.string())
-  public assets!: string[];
+  @IsNotEmpty({each: true})
+  @IsString({each: true})
+  public assets: string[] = [];
 
   public static async fromDirectory(dir: string): Promise<Config> {
     const configPath = path.join(dir, CONFIG_FILE_NAME);
-    const content = await readFile(configPath);
+    const content = (await readFile(configPath)).toString();
     // Load yaml config, use "Config" instead of "any"
-    const parsedConfig: Config = yaml.parse(content.toString());
+    const parsedConfig: Config = yaml.parse(content);
     let config: Config = new Config().merge(parsedConfig);
 
     // Validate config
-    const validationResult = jf.validate(config);
+    const result = await validate(config);
 
-    if (validationResult.error) {
-      throw new ValidationError(validationResult.error);
+    if (result.length > 0) {
+      throw new ConfigValidationError(result);
     }
-
-    // Override config with validated variant which has defaults applied
-    config = validationResult.value;
 
     // Resolve all project files
     [config.layout, config.pages, config.data, config.assets] = await Promise.all([
@@ -63,16 +66,15 @@ export class Config {
   }
 
   private static async resolveProjectFiles(projectDir: string, relativePaths: Array<string>): Promise<Array<string>> {
-    const paths = [];
+    const paths: string[] = [];
 
-    for (const relativePath of relativePaths) {
+    for (const path of relativePaths) {
       try {
-        const filePath = await Config.resolveProjectFile(projectDir, relativePath);
+        const filePath = await Config.resolveProjectFile(projectDir, path);
         paths.push(filePath);
       } catch (e) {
-        if (e instanceof ProjectFileError) {
-          // Log warning to console
-          logger.warn(e.message);
+        if (e instanceof ProjectFileNotFoundError) {
+          logger.warn(e.message); // Log warning to console
         }
       }
     }
@@ -80,47 +82,38 @@ export class Config {
     return paths;
   }
 
-  private static async resolveProjectFile(projectDir: string, relativePath: string): Promise<string> {
-    const filePath = path.join(projectDir, relativePath);
-
-    const exists = await findUp.exists(filePath);
+  private static async resolveProjectFile(dir: string, relativePath: string): Promise<string> {
+    const filePath = path.join(dir, relativePath);
+    const exists: boolean = await findUp.exists(filePath);
 
     if (!exists) {
-      throw new ProjectFileError(
-        `Could not find project file with path ${filePath}`
-      );
+      throw new ProjectFileNotFoundError(filePath);
     }
 
     return filePath;
   }
 
-  private static async resolvePages(dir: string, pageGlobs: Array<string>): Promise<Array<string>> {
+  private static async resolvePages(dir: string, globs: Array<string>): Promise<Array<string>> {
     // Glob & sort all pages in parallel
     const results = await Promise.all(
-      pageGlobs.map(async file => {
+      globs.map(async file => {
         // Match glob with project directory as cwd, retrieve absolute paths
         const files = await glob(file, {cwd: dir, absolute: true});
-
         // fast-glob makes no guarantees about sorting, so we'll sort the files per-glob here.
         return files.sort();
       })
     );
 
-    let paths: string[] = [];
+    const paths: string[] = [];
 
     results.forEach((result, index) => {
       // Glob returned no results, give warning
       if (result.length == 0) {
-        logger.warn(
-          `Page glob "${pageGlobs[index]}" did not match any files.`
-        );
+        logger.warn(`Page glob "${globs[index]}" did not match any files.`);
       }
-
-      // Flatten results
-      paths.push(...result);
+      paths.push(...result); // Flatten results
     });
 
-    // Flatten results
     return paths;
   }
 
@@ -129,34 +122,34 @@ export class Config {
    * @param config to merge
    */
   protected merge(config: Config) {
-    const setter = ([key, value]) => this[key] = value;
+    const setter = ([key, value]) => {
+      if (!value) return;
+      this[key] = value;
+    }
     Object.entries(config).forEach(setter);
     return this;
   }
 }
-
 
 export async function findProjectDirectory(): Promise<string> {
   // Walk up the directory tree
   const projectDirectory = await findUp(
     async directory => {
       // Check if the config file exists in this directory
-      const hasConfigFile = await findUp.exists(
-        path.join(directory, CONFIG_FILE_NAME)
-      );
-
+      const configFile = path.join(directory, CONFIG_FILE_NAME);
+      const hasConfigFile = await findUp.exists(configFile);
       if (hasConfigFile) {
         return directory;
       }
-      return undefined;
+      return null;
     },
     // Find directory & start in custom CWD
     {type: 'directory', cwd: getCwd()}
   );
 
   // Find-up was not able to find a directory with a config file
-  if (projectDirectory === undefined) {
-    throw new ProjectFileError('Could not find config file.');
+  if (!projectDirectory === null) {
+    throw new MissingConfigError();
   }
 
   return projectDirectory;
