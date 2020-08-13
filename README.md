@@ -1,5 +1,6 @@
 # Docmaker
 
+![github workflow](https://img.shields.io/github/workflow/status/BlameButton/docmaker/Run%20tests/master)
 ![npm](https://img.shields.io/npm/v/@blamebutton/docmaker?style=flat-square)
 ![dependencies](https://img.shields.io/librariesio/release/npm/@blamebutton/docmaker?style=flat-square)
 
@@ -17,7 +18,7 @@ Docmaker will try to find `docmaker.yaml` in the current directory or above and 
 
 Via a config file called `docmaker.yaml` you can specify pages to render, which data to load and which layout HTML file the document should use.
 
-### Example
+### Example:
 
 ```yaml
 layout: layout.html
