@@ -36,7 +36,8 @@
   "repository": "github:BlameButton/docmaker",
   "scripts": {
     "start": "ts-node src/docmaker.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "echo 'tests go brrr'"
   },
   "dependencies": {
     "fast-glob": "^3.2.2",
