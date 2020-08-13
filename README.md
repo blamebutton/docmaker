@@ -1,5 +1,8 @@
 # Docmaker
 
+![npm](https://img.shields.io/npm/v/@blamebutton/docmaker?style=flat-square)
+![dependencies](https://img.shields.io/librariesio/release/npm/@blamebutton/docmaker?style=flat-square)
+
 Docmaker is a **WIP** markdown documentation rendering tool.
 
 ---
