@@ -36,6 +36,7 @@
   "repository": "github:BlameButton/docmaker",
   "scripts": {
     "start": "ts-node src/docmaker.ts",
+    "prepare": "npm run build",
     "build": "tsc",
     "test": "echo 'tests go brrr'"
   },
