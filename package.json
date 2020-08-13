@@ -26,6 +26,9 @@
       "url": "https://github.com/bramceulemans"
     }
   ],
+  "files": [
+    "lib/"
+  ],
   "main": "index.js",
   "bin": {
     "docmaker": "index.js"
