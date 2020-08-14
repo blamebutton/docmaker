@@ -1,5 +1,9 @@
 # Docmaker
 
+![github workflow](https://img.shields.io/github/workflow/status/BlameButton/docmaker/Run%20tests/master)
+![npm](https://img.shields.io/npm/v/@blamebutton/docmaker?style=flat-square)
+![dependencies](https://img.shields.io/librariesio/release/npm/@blamebutton/docmaker?style=flat-square)
+
 Docmaker is a **WIP** markdown documentation rendering tool.
 
 ---
