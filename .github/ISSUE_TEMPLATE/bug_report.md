@@ -21,6 +21,19 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Docmaker config**
+```yaml
+layout: layout.html
+data:
+  - data.yaml
+pages:
+  - "_titlepage.html"
+  - "_toc.md"
+  - "[0-9]+*.md"
+assets:
+  - styles.css
+```
+
 **Desktop (please complete the following information):**
  - OS / version: [e.g. `Ubuntu 20.04`]
  - Docmaker version: [e.g. `0.1.2`]
