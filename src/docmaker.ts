@@ -3,20 +3,14 @@ import {basename, extname, join as pathJoin} from 'path';
 import * as signale from 'signale';
 import * as findUp from 'find-up';
 import {DocRenderer} from './doc-renderer';
-import {loadData} from './data';
+import {processDataFiles} from './data';
 import UserError from './errors/user-error';
 import {copyFile, joinFiles, mkdir, writeFile} from './utils/file-utils';
 
-const hardcodedData = {
-  break: `<div style="page-break-after: always"></div>`
-};
+export const logger = signale;
 
-const getBuildDir = async (
-  projectDir: string,
-  buildDirName: string
-): Promise<string> => {
+const getBuildDir = async (projectDir: string, buildDirName: string): Promise<string> => {
   const buildDir = pathJoin(projectDir, buildDirName);
-
   const exists = await findUp.exists(buildDir);
 
   // Create build directory if it does not yet exist
@@ -27,11 +21,7 @@ const getBuildDir = async (
   return buildDir;
 };
 
-const processAssets = async (
-  renderer: DocRenderer,
-  buildDir: string,
-  assets: string[]
-) => {
+const processAssets = async (renderer: DocRenderer, buildDir: string, assets: string[]) => {
   for (const assetPath of assets) {
     const assetBaseName = basename(assetPath);
     const assetDistPath = pathJoin(buildDir, assetBaseName);
@@ -49,12 +39,7 @@ const processAssets = async (
   }
 };
 
-const writeDocument = async (
-  renderer: DocRenderer,
-  buildDir: string,
-  layout: string,
-  content: string
-) => {
+const writeDocument = async (renderer: DocRenderer, buildDir: string, layout: string, content: string) => {
   // Render layout with data & content
   const document = await renderer.renderLiquidFile(layout, {
     content: content
@@ -65,22 +50,15 @@ const writeDocument = async (
 };
 
 const run = async () => {
-  const projectDir = await findProjectDirectory();
-  const config = await Config.fromDirectory(projectDir);
-
-  // Load all data
-  const data = {
-    ...hardcodedData,
-    ...(await loadData(config.data))
-  };
-
+  const dir = await findProjectDirectory();
+  const config = await Config.fromDirectory(dir);
+  const data = await processDataFiles(dir, config.data);
   const renderer = new DocRenderer(data);
 
   // Render all pages with data & join content
-  const joinedFiles = await joinFiles(config.pages);
-  const content = await renderer.renderPage(joinedFiles);
-
-  const buildDir = await getBuildDir(projectDir, config.buildDir);
+  const joined = await joinFiles(config.pages);
+  const content = await renderer.renderPage(joined);
+  const buildDir = await getBuildDir(dir, config.buildDir);
 
   await writeDocument(renderer, buildDir, config.layout, content);
   await processAssets(renderer, buildDir, config.assets);
@@ -90,11 +68,10 @@ const run = async () => {
 run().catch(e => {
   // Print without stacktrace if this is an error caused by the user
   if (e instanceof UserError) {
-    signale.error(e.message);
+    logger.error(e.message);
   } else {
-    signale.error(e);
+    logger.error(e);
   }
-
   // Exit with 1 exit-code
   process.exit(1);
 });

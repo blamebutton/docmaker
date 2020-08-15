@@ -2,12 +2,11 @@ import * as findUp from 'find-up';
 import * as yaml from 'yaml';
 import * as path from 'path';
 import * as glob from 'fast-glob';
-import * as signale from 'signale';
 import * as jf from 'joiful';
-import {cwd as getProcessCwd, env} from 'process';
 import ProjectFileError from './errors/project-file-error';
-import {readFile} from './utils/file-utils';
+import {getCwd, readFile} from './utils/file-utils';
 import ValidationError from './errors/validation-error';
+import {logger} from './docmaker';
 
 const CONFIG_FILE_NAME = 'docmaker.yaml';
 
@@ -31,8 +30,8 @@ export class Config {
   @jf.array().default([]).items(t => t.string())
   public assets!: string[];
 
-  public static async fromDirectory(projectDir: string): Promise<Config> {
-    const configPath = path.join(projectDir, CONFIG_FILE_NAME);
+  public static async fromDirectory(dir: string): Promise<Config> {
+    const configPath = path.join(dir, CONFIG_FILE_NAME);
     const content = await readFile(configPath);
     // Load yaml config, use "Config" instead of "any"
     const parsedConfig: Config = yaml.parse(content.toString());
@@ -51,22 +50,19 @@ export class Config {
     // Resolve all project files
     [config.layout, config.pages, config.data, config.assets] = await Promise.all([
       // Resolve the layout template
-      Config.resolveProjectFile(projectDir, config.layout),
+      Config.resolveProjectFile(dir, config.layout),
       // Resolve the globs for the pages
-      Config.resolvePages(projectDir, config.pages),
+      Config.resolvePages(dir, config.pages),
       // Resolve the relative paths to the data files
-      Config.resolveProjectFiles(projectDir, config.data),
+      Config.resolveProjectFiles(dir, config.data),
       // Resolve the relative paths to the asset files
-      Config.resolveProjectFiles(projectDir, config.assets)
+      Config.resolveProjectFiles(dir, config.assets)
     ]);
 
     return config;
   }
 
-  private static async resolveProjectFiles(
-    projectDir: string,
-    relativePaths: Array<string>
-  ): Promise<Array<string>> {
+  private static async resolveProjectFiles(projectDir: string, relativePaths: Array<string>): Promise<Array<string>> {
     const paths = [];
 
     for (const relativePath of relativePaths) {
@@ -76,7 +72,7 @@ export class Config {
       } catch (e) {
         if (e instanceof ProjectFileError) {
           // Log warning to console
-          signale.warn(e.message);
+          logger.warn(e.message);
         }
       }
     }
@@ -84,10 +80,7 @@ export class Config {
     return paths;
   }
 
-  private static async resolveProjectFile(
-    projectDir: string,
-    relativePath: string
-  ): Promise<string> {
+  private static async resolveProjectFile(projectDir: string, relativePath: string): Promise<string> {
     const filePath = path.join(projectDir, relativePath);
 
     const exists = await findUp.exists(filePath);
@@ -101,10 +94,7 @@ export class Config {
     return filePath;
   }
 
-  private static async resolvePages(
-    dir: string,
-    pageGlobs: Array<string>
-  ): Promise<Array<string>> {
+  private static async resolvePages(dir: string, pageGlobs: Array<string>): Promise<Array<string>> {
     // Glob & sort all pages in parallel
     const results = await Promise.all(
       pageGlobs.map(async file => {
@@ -121,7 +111,7 @@ export class Config {
     results.forEach((result, index) => {
       // Glob returned no results, give warning
       if (result.length == 0) {
-        signale.warn(
+        logger.warn(
           `Page glob "${pageGlobs[index]}" did not match any files.`
         );
       }
@@ -145,15 +135,6 @@ export class Config {
   }
 }
 
-function getCwd(): string {
-  // Use original CWD when ran from an NPM script
-  if (env.INIT_CWD !== undefined) {
-    return env.INIT_CWD;
-  }
-
-  // Return current CWD when ran standalone
-  return getProcessCwd();
-}
 
 export async function findProjectDirectory(): Promise<string> {
   // Walk up the directory tree
@@ -169,7 +150,7 @@ export async function findProjectDirectory(): Promise<string> {
       }
       return undefined;
     },
-    // find directory & start in custom CWD
+    // Find directory & start in custom CWD
     {type: 'directory', cwd: getCwd()}
   );
 
