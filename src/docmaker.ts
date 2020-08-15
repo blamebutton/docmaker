@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import {Config, findProjectDirectory} from './config';
 import {basename, extname, join as pathJoin} from 'path';
 import * as signale from 'signale';
@@ -45,7 +44,7 @@ const processAssets = async (
         await writeFile(assetDistPath, renderedAsset);
         break;
       default:
-        await copyFile(assetPath, assetDistPath, fs.constants.COPYFILE_EXCL);
+        await copyFile(assetPath, assetDistPath);
     }
   }
 };
