@@ -18,7 +18,7 @@ export class MarkdownRenderer implements FileRenderer {
       html: true,
     });
     // @ts-ignore
-    this.markdown.use(anchorPlugin)
+    this.markdown.use(anchorPlugin);
     this.markdown.use(tocPlugin, {level: 2});
     this.markdown.use(umlPlugin);
   }
@@ -29,7 +29,7 @@ export class MarkdownRenderer implements FileRenderer {
         return MarkdownRenderer.highlight(lang, str).value;
       } catch (_) {
       }
-      return ""; // use external default escaping
+      return ''; // use external default escaping
     }
     return null;
   }

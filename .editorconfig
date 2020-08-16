@@ -10,10 +10,19 @@ max_line_length = 120
 trim_trailing_whitespace = true
 tab_width = 2
 
+[*.yaml]
+ij_yaml_spaces_within_brackets = true
+ij_yaml_spaces_within_braces = true
+ij_yaml_keep_indents_on_empty_lines = false
+
 [*.js]
 ij_javascript_force_quote_style = true
 ij_javascript_use_double_quotes = false
+ij_javascript_force_semicolon_style = true
+ij_javascript_use_semicolon_after_statement = true
 
 [*.ts]
 ij_typescript_force_quote_style = true
 ij_typescript_use_double_quotes = false
+ij_typescript_force_semicolon_style = true
+ij_typescript_use_semicolon_after_statement = true
