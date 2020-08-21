@@ -1,6 +1,6 @@
 import FileRenderer from './file-renderer';
 import * as MarkdownIt from 'markdown-it';
-import {getLanguage} from 'highlight.js';
+import {getLanguage, highlight} from 'highlight.js';
 import * as tocPlugin from 'markdown-it-toc-done-right';
 import * as anchorPlugin from 'markdown-it-anchor';
 import * as umlPlugin from 'markdown-it-textual-uml';
@@ -13,8 +13,8 @@ export class MarkdownRenderer implements FileRenderer {
   constructor() {
     this.markdown = new MarkdownIt({
       typographer: true,
+      highlight: (str, lang) => this.highlight(str, lang),
       linkify: true,
-      highlight: MarkdownRenderer.highlight,
       html: true,
     });
     // @ts-ignore
@@ -23,15 +23,16 @@ export class MarkdownRenderer implements FileRenderer {
     this.markdown.use(umlPlugin);
   }
 
-  private static highlight(str: string, lang: string) {
+  private highlight(str: string, lang: string) {
+    let code = '';
+    
     if (lang && getLanguage(lang)) {
-      try {
-        return MarkdownRenderer.highlight(lang, str).value;
-      } catch (_) {
-      }
-      return ''; // use external default escaping
+      code = highlight(lang, str, true).value;
+    } else {
+      code = this.markdown.utils.escapeHtml(str);
     }
-    return null;
+
+    return `<pre class="hljs"><code>${code}</code></pre>`;
   }
 
   /**
