@@ -1,6 +1,5 @@
 body {
-  font-family: "Roboto", "Material Icons", "Helvetica Neue", Helvetica, Arial,
-    sans-serif;
+  font-family: "Roboto", "Material Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 h1.title {
@@ -45,7 +44,7 @@ p.center {
   padding-top: 5mm;
   counter-increment: page;
   font-family: "Roboto", "Material Icons", "Helvetica Neue", Helvetica, Arial,
-    sans-serif;
+  sans-serif;
   white-space: pre;
   color: grey;
 

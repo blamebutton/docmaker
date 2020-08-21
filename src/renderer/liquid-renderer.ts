@@ -1,6 +1,6 @@
-import FileRenderer from "./file-renderer";
-import {Liquid} from "liquidjs";
-import {readFile} from "../utils/file-utils";
+import FileRenderer from './file-renderer';
+import {Liquid} from 'liquidjs';
+import {readFile} from '../utils/file-utils';
 
 export class LiquidRenderer implements FileRenderer {
 
