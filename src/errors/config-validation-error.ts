@@ -4,9 +4,14 @@ import {ValidationError} from 'class-validator';
 export default class ConfigValidationError extends UserError {
   constructor(errors: ValidationError[]) {
     const messages = errors
-      .map(e => `validation error on ${e.property} with value '${e.value}'`)
+      .map(e => {
+        const property = e.property;
+        const value = e.value;
+        const constraints = Object.values(e.constraints).map(v => `\t\t* ${v}`).join('\n');
+        return `\t* Property: "${property}" = "${value}"\n${constraints}`;
+      })
       .join('\n');
-    super(`config validation: ${messages}`);
+    super(`config validation:\n\n${messages}\n`);
     Object.setPrototypeOf(this, ConfigValidationError.prototype);
   }
 }
