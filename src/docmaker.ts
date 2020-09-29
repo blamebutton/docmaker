@@ -25,10 +25,9 @@ const processAssets = async (renderer: DocRenderer, buildDir: string, assets: st
   for (const assetPath of assets) {
     const assetBaseName = basename(assetPath);
     const assetDistPath = pathJoin(buildDir, assetBaseName);
+    const extension = extname(assetBaseName);
 
-    const fileExt = extname(assetBaseName);
-
-    switch (fileExt) {
+    switch (extension) {
       case '.css':
         const renderedAsset = await renderer.renderLiquidFile(assetPath);
         await writeFile(assetDistPath, renderedAsset);
