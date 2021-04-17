@@ -41,30 +41,28 @@
     "test": "echo 'tests go brrr'"
   },
   "dependencies": {
-    "class-validator": "^0.12.2",
-    "fast-glob": "^3.2.2",
-    "find-up": "^4.1.0",
-    "highlight.js": "^10.0.3",
-    "liquidjs": "^9.12.0",
-    "markdown-it": "^11.0.0",
-    "markdown-it-anchor": "^5.3.0",
+    "class-validator": "^0.13.1",
+    "fast-glob": "^3.2.5",
+    "find-up": "^5.0.0",
+    "highlight.js": "^10.7.2",
+    "liquidjs": "^9.23.4",
+    "markdown-it": "^12.0.6",
+    "markdown-it-anchor": "^7.1.0",
     "markdown-it-github-preamble": "^1.0.0",
-    "markdown-it-textual-uml": "^0.1.3",
+    "markdown-it-textual-uml": "^0.1.6",
     "markdown-it-toc-done-right": "git://github.com/nagaozen/markdown-it-toc-done-right.git#master",
     "reflect-metadata": "^0.1.13",
     "signale": "^1.4.0",
     "source-map-support": "^0.5.19",
-    "yaml": "^1.10.0"
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "@types/highlight.js": "^9.12.4",
-    "@types/markdown-it": "^10.0.1",
-    "@types/markdown-it-anchor": "^4.0.4",
-    "@types/node": "^14.0.27",
+    "@types/markdown-it": "^12.0.1",
+    "@types/node": "^14.14.41",
     "@types/signale": "^1.4.1",
-    "@types/source-map-support": "^0.5.1",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.5"
+    "@types/source-map-support": "^0.5.3",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "private": false
 }
