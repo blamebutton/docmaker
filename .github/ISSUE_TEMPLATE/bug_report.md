@@ -34,7 +34,7 @@ pages:
   - "_toc.md"
   - "[0-9]+*.md"
 assets:
-  - styles.css
+  - styles.css.liquid
 ```
 
 #### Desktop (please complete the following information)

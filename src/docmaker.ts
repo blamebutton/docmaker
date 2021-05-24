@@ -1,9 +1,9 @@
-import {Config, findProjectDirectory} from './config';
+import * as findUp from 'find-up';
 import {basename, extname, join as pathJoin} from 'path';
 import * as signale from 'signale';
-import * as findUp from 'find-up';
-import {DocRenderer} from './doc-renderer';
+import {Config, findProjectDirectory} from './config';
 import {processDataFiles} from './data';
+import {DocRenderer} from './doc-renderer';
 import UserError from './errors/user-error';
 import {copyFile, joinFiles, mkdir, writeFile} from './utils/file-utils';
 
@@ -24,13 +24,14 @@ const getBuildDir = async (projectDir: string, buildDirName: string): Promise<st
 const processAssets = async (renderer: DocRenderer, buildDir: string, assets: string[]) => {
   for (const assetPath of assets) {
     const assetBaseName = basename(assetPath);
-    const assetDistPath = pathJoin(buildDir, assetBaseName);
     const extension = extname(assetBaseName);
+    const assetDistPath = pathJoin(buildDir, assetBaseName);
 
     switch (extension) {
-      case '.css':
+      case '.liquid':
         const renderedAsset = await renderer.renderLiquidFile(assetPath);
-        await writeFile(assetDistPath, renderedAsset);
+        // Remove liquid extension from resulting file
+        await writeFile(assetDistPath.replace(extension, ''), renderedAsset);
         break;
       default:
         await copyFile(assetPath, assetDistPath);
