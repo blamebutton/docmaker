@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ '8', '10', '12', '14' ]
+        node: [ '12', '14', '16' ]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node }}
@@ -27,10 +27,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12
+      - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 14
           registry-url: https://registry.npmjs.org/
       - run: yarn install --frozen-lockfile
       - run: npm publish --access public
@@ -42,10 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 12
+      - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 14
           registry-url: https://npm.pkg.github.com/
       - run: yarn install --frozen-lockfile
       - run: npm publish --access public
