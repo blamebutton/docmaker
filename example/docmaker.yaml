@@ -7,5 +7,5 @@ data:
   - data.yaml
   - dynamic_data.js
 assets:
-  - styles.css
+  - styles.css.liquid
   - "*.png"
