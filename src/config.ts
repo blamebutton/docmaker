@@ -123,7 +123,7 @@ export class Config {
    */
   private static async resolveProjectFile(dir: string, relativePath: string): Promise<string> {
     const filePath = path.join(dir, relativePath);
-    const exists: boolean = await findUp.exists(filePath);
+    const exists: boolean = await findUp.pathExists(filePath);
 
     if (!exists) {
       throw new ProjectFileNotFoundError(filePath);
@@ -166,11 +166,11 @@ export class Config {
  */
 export async function findProjectDirectory(): Promise<string> {
   // Walk up the directory tree
-  const projectDirectory = await findUp(
+  const projectDirectory = await findUp.findUp(
     async directory => {
       // Check if the config file exists in this directory
       const configFile = path.join(directory, CONFIG_FILE_NAME);
-      const hasConfigFile = await findUp.exists(configFile);
+      const hasConfigFile = await findUp.pathExists(configFile);
       if (hasConfigFile) {
         return directory;
       }

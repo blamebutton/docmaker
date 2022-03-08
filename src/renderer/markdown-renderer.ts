@@ -1,9 +1,9 @@
-import {getLanguage, highlight} from 'highlight.js';
+import hljs from 'highlight.js';
 import * as MarkdownIt from 'markdown-it';
 import * as anchorPlugin from 'markdown-it-anchor';
-import * as footnotePlugin from 'markdown-it-footnote';
-import * as umlPlugin from 'markdown-it-textual-uml';
-import * as tocPlugin from 'markdown-it-toc-done-right';
+import footnotePlugin from 'markdown-it-footnote';
+import umlPlugin from 'markdown-it-textual-uml';
+import tocPlugin from 'markdown-it-toc-done-right';
 import {readFile} from '../utils/file-utils';
 import FileRenderer from './file-renderer';
 
@@ -26,10 +26,10 @@ export class MarkdownRenderer implements FileRenderer {
   }
 
   private highlight(str: string, lang: string) {
-    let code = '';
+    let code: string;
 
-    if (lang && getLanguage(lang)) {
-      code = highlight(lang, str, true).value;
+    if (lang && hljs.getLanguage(lang)) {
+      code = hljs.highlight(lang, str, true).value;
     } else {
       code = this.markdown.utils.escapeHtml(str);
     }

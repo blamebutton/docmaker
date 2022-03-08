@@ -11,7 +11,7 @@ export const logger = signale;
 
 const getBuildDir = async (projectDir: string, buildDirName: string): Promise<string> => {
   const buildDir = pathJoin(projectDir, buildDirName);
-  const exists = await findUp.exists(buildDir);
+  const exists = await findUp.pathExists(buildDir);
 
   // Create build directory if it does not yet exist
   if (!exists) {
