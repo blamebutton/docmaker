@@ -377,9 +377,9 @@ markdown-it-textual-uml@^0.10.0:
   resolved "https://registry.yarnpkg.com/markdown-it-textual-uml/-/markdown-it-textual-uml-0.10.0.tgz#36625551f1ec93c8c38ff6c1e0c46e178d623adf"
   integrity sha512-PaDPL4ycyE5PICo65e6sGqkn6NhqD6pupNomF7maXWvInTVpxHayw14LgSqXqCoWSeQhf42RWGM8VJMKe/8LAA==
 
-"markdown-it-toc-done-right@git://github.com/blamebutton/markdown-it-toc-done-right.git#master":
+"markdown-it-toc-done-right@git+https://github.com/blamebutton/markdown-it-toc-done-right.git#master":
   version "4.2.0"
-  resolved "git://github.com/blamebutton/markdown-it-toc-done-right.git#e2fc7d3c876b857765a749a778fb43ae8906b99b"
+  resolved "git+https://github.com/blamebutton/markdown-it-toc-done-right.git#e2fc7d3c876b857765a749a778fb43ae8906b99b"
 
 markdown-it@^12.3.2:
   version "12.3.2"
