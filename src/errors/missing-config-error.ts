@@ -1,4 +1,4 @@
-import UserError from './user-error';
+import UserError from './user-error.js';
 
 export default class MissingConfigError extends UserError {
   constructor() {

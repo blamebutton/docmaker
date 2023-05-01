@@ -1,11 +1,11 @@
 import * as findUp from 'find-up';
 import {basename, extname, join as pathJoin} from 'path';
-import * as signale from 'signale';
-import {Config, findProjectDirectory} from './config';
-import {processDataFiles} from './data';
-import {DocRenderer} from './doc-renderer';
-import UserError from './errors/user-error';
-import {copyFile, joinFiles, mkdir, writeFile} from './utils/file-utils';
+import signale from 'signale';
+import {Config, findProjectDirectory} from './config.js';
+import {processDataFiles} from './data.js';
+import {DocRenderer} from './doc-renderer.js';
+import UserError from './errors/user-error.js';
+import {copyFile, joinFiles, mkdir, writeFile} from './utils/file-utils.js';
 
 export const logger = signale;
 

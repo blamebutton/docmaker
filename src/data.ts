@@ -1,8 +1,8 @@
 import * as yaml from 'yaml';
-import UserError from './errors/user-error';
+import UserError from './errors/user-error.js';
 import {extname} from 'path';
-import {getCwd, readFile} from './utils/file-utils';
-import {logger} from './docmaker';
+import {getCwd, readFile} from './utils/file-utils.js';
+import {logger} from './docmaker.js';
 
 const defaultData = {
   break: `<div style="page-break-after: always"></div>`,
@@ -24,7 +24,7 @@ const loadDataFile = async (file: string): Promise<any> => {
   const fileExt = extname(file);
 
   switch (fileExt) {
-    case '.js':
+    case '.cjs':
       return loadJsDataFile(file);
     case '.yaml':
     case '.yml':

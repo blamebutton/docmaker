@@ -1,13 +1,13 @@
 import * as findUp from 'find-up';
-import * as yaml from 'yaml';
-import * as path from 'path';
-import * as glob from 'fast-glob';
-import ProjectFileNotFoundError from './errors/project-file-not-found-error';
-import {getCwd, readFile} from './utils/file-utils';
-import ConfigValidationError from './errors/config-validation-error';
+import yaml from 'yaml';
+import path from 'path';
+import glob from 'fast-glob';
+import ProjectFileNotFoundError from './errors/project-file-not-found-error.js';
+import {getCwd, readFile} from './utils/file-utils.js';
+import ConfigValidationError from './errors/config-validation-error.js';
 import {IsNotEmpty, IsString, validate} from 'class-validator';
-import MissingConfigError from './errors/missing-config-error';
-import {logger} from './docmaker';
+import MissingConfigError from './errors/missing-config-error.js';
+import {logger} from './docmaker.js';
 
 const CONFIG_FILE_NAME = 'docmaker.yaml';
 

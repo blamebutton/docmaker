@@ -1,5 +1,4 @@
 #!/usr/bin/env node
 
-
-require('source-map-support').install();
-require('./lib/docmaker');
+import 'source-map-support/register.js'
+import './lib/docmaker.js'

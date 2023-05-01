@@ -1,11 +1,11 @@
 import hljs from 'highlight.js';
-import * as MarkdownIt from 'markdown-it';
-import * as anchorPlugin from 'markdown-it-anchor';
+import MarkdownIt from 'markdown-it';
+import anchorPlugin from 'markdown-it-anchor';
 import footnotePlugin from 'markdown-it-footnote';
 import umlPlugin from 'markdown-it-textual-uml';
 import tocPlugin from 'markdown-it-toc-done-right';
-import {readFile} from '../utils/file-utils';
-import FileRenderer from './file-renderer';
+import {readFile} from '../utils/file-utils.js';
+import FileRenderer from './file-renderer.js';
 
 export class MarkdownRenderer implements FileRenderer {
 
