@@ -1,4 +1,4 @@
-import UserError from './user-error';
+import UserError from './user-error.js';
 
 export default class ProjectFileNotFoundError extends UserError {
   constructor(message: string) {

@@ -1,5 +1,6 @@
 {
   "name": "@blamebutton/docmaker",
+  "type": "module",
   "version": "0.2.1",
   "description": "A markdown document rendering tool",
   "keywords": [
@@ -44,25 +45,25 @@
     "test": "echo 'tests go brrr'"
   },
   "dependencies": {
-    "class-validator": "^0.13.2",
-    "fast-glob": "^3.2.11",
+    "class-validator": "^0.14.0",
+    "fast-glob": "^3.2.12",
     "find-up": "^6.3.0",
-    "highlight.js": "^11.4.0",
-    "liquidjs": "^9.36.0",
-    "markdown-it": "^12.3.2",
-    "markdown-it-anchor": "^8.4.1",
+    "highlight.js": "^11.8.0",
+    "liquidjs": "^10.7.1",
+    "markdown-it": "^13.0.1",
+    "markdown-it-anchor": "^8.6.7",
     "markdown-it-footnote": "^3.0.3",
     "markdown-it-github-preamble": "^1.0.0",
-    "markdown-it-textual-uml": "^0.10.0",
-    "markdown-it-toc-done-right": "git://github.com/blamebutton/markdown-it-toc-done-right.git#master",
+    "markdown-it-textual-uml": "^0.12.0",
+    "markdown-it-toc-done-right": "git+https://github.com/blamebutton/markdown-it-toc-done-right.git#master",
     "reflect-metadata": "^0.1.13",
     "signale": "^1.4.0",
     "source-map-support": "^0.5.21",
-    "yaml": "^1.10.2"
+    "yaml": "^2.2.2"
   },
   "devDependencies": {
     "@types/markdown-it": "^12.2.3",
-    "@types/node": "^16.11.7",
+    "@types/node": "^16.18.25",
     "@types/signale": "^1.4.4",
     "@types/source-map-support": "^0.5.4",
     "ts-node": "^10.7.0",

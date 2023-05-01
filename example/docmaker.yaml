@@ -5,7 +5,7 @@ pages:
   - "[0-9]+*.md"
 data:
   - data.yaml
-  - dynamic_data.js
+  - dynamic_data.cjs
 assets:
   - styles.css.liquid
   - "*.png"

@@ -1,6 +1,6 @@
-import FileRenderer from './renderer/file-renderer';
-import {MarkdownRenderer} from './renderer/markdown-renderer';
-import {LiquidRenderer} from './renderer/liquid-renderer';
+import FileRenderer from './renderer/file-renderer.js';
+import {MarkdownRenderer} from './renderer/markdown-renderer.js';
+import {LiquidRenderer} from './renderer/liquid-renderer.js';
 
 export class DocRenderer {
 

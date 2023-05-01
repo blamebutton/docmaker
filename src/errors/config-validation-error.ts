@@ -1,4 +1,4 @@
-import UserError from './user-error';
+import UserError from './user-error.js';
 import {ValidationError} from 'class-validator';
 
 export default class ConfigValidationError extends UserError {
