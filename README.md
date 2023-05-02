@@ -1,6 +1,6 @@
 # Docmaker
 
-![github workflow](https://img.shields.io/github/workflow/status/BlameButton/docmaker/Run%20tests/master)
+![github workflow](https://img.shields.io/github/actions/workflow/status/BlameButton/docmaker/.github/workflows/npm-test.yml?branch=master)
 ![npm](https://img.shields.io/npm/v/@blamebutton/docmaker?style=flat-square)
 ![dependencies](https://img.shields.io/librariesio/release/npm/@blamebutton/docmaker?style=flat-square)
 
