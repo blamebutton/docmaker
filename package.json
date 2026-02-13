@@ -50,7 +50,7 @@
     "find-up": "^6.3.0",
     "highlight.js": "^11.8.0",
     "liquidjs": "^10.7.1",
-    "markdown-it": "^13.0.1",
+    "markdown-it": "^14.1.1",
     "markdown-it-anchor": "^8.6.7",
     "markdown-it-footnote": "^3.0.3",
     "markdown-it-github-preamble": "^1.0.0",
